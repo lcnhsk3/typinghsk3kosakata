@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game HSK3 bersama Shinchan</title>
+    <!-- Font & Ikon -->
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- EmailJS -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Comic Neue', cursive, sans-serif;
+            background: linear-gradient(135deg, #f9d56e, #f8b042);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            margin: 0;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 800px;
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(5px);
+            border-radius: 60px 60px 40px 40px;
+            box-shadow: 0 20px 30px rgba(0,0,0,0.2), 0 0 0 8px #ff8a5c, 0 0 0 12px #f5e56b;
+            padding: 24px;
+            border: 5px dashed #ff5e6b;
+            position: relative;
+        }
+
+        /* Kepala Shinchan di pojok */
+        .shinchan-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffb347;
+            padding: 15px 25px;
+            border-radius: 100px 100px 30px 30px;
+            margin-bottom: 25px;
+            border: 4px solid #e06641;
+            box-shadow: 0 8px 0 #b44d2e;
+        }
+
+        .shinchan-avatar {
+            font-size: 60px;
+            filter: drop-shadow(4px 6px 0 #ffef9f);
+        }
+
+        .shinchan-avatar i {
+            background: #fdd0b5;
+            border-radius: 50%;
+            padding: 10px;
+            border: 4px solid #e6845e;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #4b2e1b;
+            text-shadow: 3px 3px 0 #fbf1a4;
+            background: #fff0b5;
+            padding: 8px 25px;
+            border-radius: 40px;
+            border: 3px solid #e6a345;
+            transform: rotate(-2deg);
+        }
+
+        .progress-card {
+            background: #b0e57c;
+            padding: 12px 20px;
+            border-radius: 40px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #2d5e1e;
+            display: inline-block;
+            border: 4px solid #6b8c42;
+            margin-bottom: 25px;
+            box-shadow: 0 6px 0 #4f6b31;
+        }
+
+        .soal-box {
+            background: #fee599;
+            border-radius: 70px 70px 30px 30px;
+            padding: 30px 20px;
+            border: 5px solid #fbb03b;
+            box-shadow: inset 0 -8px 0 #e69a2e, 0 15px 0 #c57c1f;
+            margin-bottom: 30px;
+        }
+
+        .arti-text {
+            font-size: 36px;
+            text-align: center;
+            color: #3f2b15;
+            background: #fffbe3;
+            display: inline-block;
+            padding: 10px 40px;
+            border-radius: 50px;
+            margin-bottom: 25px;
+            border: 4px dashed #ff8a5c;
+        }
+
+        .input-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .hanzi-input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .hanzi-input {
+            width: 100%;
+            font-size: 48px;
+            padding: 20px 25px;
+            font-family: 'Comic Neue', 'KaiTi', '楷体', 'STKaiti', serif;
+            text-align: center;
+            background: #fffef7;
+            border: 6px solid #fece6b;
+            border-radius: 80px;
+            outline: none;
+            color: #2c3e50;
+            box-shadow: 0 8px 0 #d4a15a, inset 0 2px 10px #ffeeaa;
+            transition: 0.1s;
+            letter-spacing: 4px;
+        }
+
+        .hanzi-input:focus {
+            border-color: #ff8a5c;
+            box-shadow: 0 8px 0 #c5653c, inset 0 2px 10px #ffe48f;
+        }
+
+        .audio-btn {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #ff6f61;
+            border: none;
+            font-size: 32px;
+            color: white;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 4px solid #fff;
+            box-shadow: 0 6px 0 #b1453b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.1s;
+        }
+
+        .audio-btn:active {
+            transform: translateY(-50%) scale(0.9);
+            box-shadow: 0 2px 0 #b1453b;
+        }
+
+        .feedback {
+            font-size: 28px;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 50px;
+            text-align: center;
+            background: #feebc0;
+            border: 4px solid #ffb248;
+            min-height: 85px;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 18px;
+            margin: 30px 0 15px;
+        }
+
+        .btn {
+            font-family: 'Comic Neue', cursive;
+            font-size: 32px;
+            font-weight: bold;
+            padding: 15px 35px;
+            border: none;
+            border-radius: 60px;
+            background: #fdd023;
+            color: #423111;
+            border-bottom: 8px solid #c7951e;
+            cursor: pointer;
+            transition: 0.1s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 5px 0 #9e7518;
+        }
+
+        .btn:active {
+            transform: translateY(5px);
+            border-bottom-width: 3px;
+        }
+
+        .btn-submit {
+            background: #6fda6f;
+            border-bottom-color: #2e8b2e;
+        }
+
+        .btn-next {
+            background: #6ec8e0;
+            border-bottom-color: #36859b;
+        }
+
+        .footer-email {
+            font-size: 18px;
+            color: #6b3f00;
+            background: #fffacd;
+            border-radius: 30px;
+            padding: 8px 15px;
+            text-align: center;
+            border: 2px solid #e6a345;
+        }
+
+        /* dekorasi lucu */
+        .decor {
+            position: absolute;
+            font-size: 40px;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .decor1 { top: 10px; left: 10px; transform: rotate(-15deg); }
+        .decor2 { bottom: 10px; right: 10px; transform: rotate(20deg); }
+    </style>
+</head>
+<body>
+<div class="game-container">
+    <div class="shinchan-header">
+        <div class="shinchan-avatar">
+            <i class="fas fa-child"></i> <!-- ikon anak sebagai Shinchan -->
+        </div>
+        <div class="title">Shinchan's HSK3 by lcnpalembang</div>
+        <div class="shinchan-avatar">
+            <i class="fas fa-dog"></i> <!-- Shiro -->
+        </div>
+    </div>
+
+    <!-- progress -->
+    <div class="progress-card" id="progressDisplay">Soal 1 / 318</div>
+
+    <!-- soal -->
+    <div class="soal-box">
+        <div class="arti-text" id="soalArti">akhir pekan</div>
+        <div class="input-area">
+            <div class="hanzi-input-wrapper">
+                <input type="text" class="hanzi-input" id="jawabanInput" placeholder="Ketik hanzi..." autocomplete="off">
+                <button class="audio-btn" id="audioBtn"><i class="fas fa-volume-up"></i></button>
+            </div>
+        </div>
+        <div class="feedback" id="feedbackArea">✏️ Tulis jawaban di kotak, lalu tekan submit!</div>
+    </div>
+
+    <!-- tombol -->
+    <div class="action-buttons">
+        <button class="btn btn-submit" id="submitBtn"><i class="fas fa-check-circle"></i> Submit</button>
+        <button class="btn btn-next" id="nextBtn"><i class="fas fa-arrow-right"></i> Next</button>
+    </div>
+
+    <div class="footer-email">
+        <i class="fas fa-envelope"></i> Hasil akan terkirim ke lcnhsk3palembang@gmail.com
+    </div>
+
+    <!-- dekorasi lucu -->
+    <div class="decor decor1">🧸</div>
+    <div class="decor decor2">🍙</div>
+</div>
+
+<script>
+    (function() {
+        // Inisialisasi EmailJS (ganti dengan public key milikmu)
+        emailjs.init("YOUR_PUBLIC_KEY"); // Daftar di emailjs.com, ganti ini!
+
+        // =================== DATA KOSAKATA LENGKAP (318 item) ===================
+        const vocab = [
+            // Lesson 1 (1-16)
+            { indonesia: "akhir pekan", hanzi: "周末", pinyin: "zhōumò" },
+            { indonesia: "berencana", hanzi: "打算", pinyin: "dǎsuàn" },
+            { indonesia: "akhiran 'ya'", hanzi: "啊", pinyin: "ā" },
+            { indonesia: "dengan/ikut", hanzi: "跟", pinyin: "gēn" },
+            { indonesia: "nama orang", hanzi: "小刚", pinyin: "xiǎo gāng" },
+            { indonesia: "terus/selalu", hanzi: "一直", pinyin: "yīzhí" },
+            { indonesia: "permainan", hanzi: "游戏", pinyin: "yóuxì" },
+            { indonesia: "tugas/pr", hanzi: "作业", pinyin: "zuòyè" },
+            { indonesia: "cemas/khawatir", hanzi: "着急", pinyin: "zháojí" },
+            { indonesia: "mengulang", hanzi: "复习", pinyin: "fùxí" },
+            { indonesia: "(bagian) selatan", hanzi: "南方", pinyin: "nánfāng" },
+            { indonesia: "(bagian) utara", hanzi: "北方", pinyin: "běifāng" },
+            { indonesia: "roti", hanzi: "面包", pinyin: "miànbāo" },
+            { indonesia: "membawa", hanzi: "带", pinyin: "dāi" },
+            { indonesia: "peta", hanzi: "地图", pinyin: "dìtú" },
+            { indonesia: "pindah/memindahkan", hanzi: "搬", pinyin: "bān" },
+            // Lesson 2 (17-33)
+            { indonesia: "(lutut)kaki", hanzi: "腿", pinyin: "tuǐ" },
+            { indonesia: "sakit", hanzi: "疼", pinyin: "téng" },
+            { indonesia: "kaki", hanzi: "脚", pinyin: "jiǎo" },
+            { indonesia: "pohon", hanzi: "树", pinyin: "shù" },
+            { indonesia: "mudah", hanzi: "容易", pinyin: "róngyì" },
+            { indonesia: "sulit/susah", hanzi: "难", pinyin: "nán" },
+            { indonesia: "nyonya/istri", hanzi: "太太", pinyin: "tàitai" },
+            { indonesia: "sekretaris", hanzi: "秘书", pinyin: "mìshū" },
+            { indonesia: "menejer", hanzi: "经理", pinyin: "jīngli" },
+            { indonesia: "kantor", hanzi: "办公室", pinyin: "bàngōngshì" },
+            { indonesia: "satuan u/kendaraan", hanzi: "辆", pinyin: "liàng" },
+            { indonesia: "gedung/tingkat", hanzi: "楼", pinyin: "lóu" },
+            { indonesia: "partikel diikuti obj", hanzi: "把", pinyin: "bǎ" },
+            { indonesia: "payung", hanzi: "伞", pinyin: "sǎn" },
+            { indonesia: "gemuk", hanzi: "胖", pinyin: "pàng" },
+            { indonesia: "sebenarnya", hanzi: "其实", pinyin: "qíshí" },
+            { indonesia: "kurus", hanzi: "瘦", pinyin: "shòu" },
+            // Lesson 3 (34-50)
+            { indonesia: "atau/masih", hanzi: "还是", pinyin: "háishì" },
+            { indonesia: "mendaki gunung", hanzi: "爬山", pinyin: "pá shān" },
+            { indonesia: "hati-hati", hanzi: "小心", pinyin: "xiǎoxīn" },
+            { indonesia: "satuan untuk rok/celana", hanzi: "条", pinyin: "tiáo" },
+            { indonesia: "celana", hanzi: "裤子", pinyin: "kùzi" },
+            { indonesia: "ingat", hanzi: "记得", pinyin: "jìde" },
+            { indonesia: "kemeja", hanzi: "衬衫", pinyin: "chènshān" },
+            { indonesia: "mata uang China", hanzi: "元", pinyin: "yuán" },
+            { indonesia: "segar", hanzi: "新鲜", pinyin: "xīnxiān" },
+            { indonesia: "manis", hanzi: "甜", pinyin: "tián" },
+            { indonesia: "hanya", hanzi: "只", pinyin: "zhǐ" },
+            { indonesia: "meletakkan", hanzi: "放", pinyin: "fàng" },
+            { indonesia: "minuman", hanzi: "饮料", pinyin: "yǐnliào" },
+            { indonesia: "atau", hanzi: "或者", pinyin: "huòzhe" },
+            { indonesia: "nyaman", hanzi: "舒服", pinyin: "shūfu" },
+            { indonesia: "bunga/menghabiskan", hanzi: "花", pinyin: "huā" },
+            { indonesia: "hijau", hanzi: "绿", pinyin: "lǜ" },
+            // Lesson 4 (51-67)
+            { indonesia: "lomba/pertandingan", hanzi: "比赛", pinyin: "bǐsài" },
+            { indonesia: "foto/gambar", hanzi: "照片", pinyin: "zhàopiàn" },
+            { indonesia: "tingkatan", hanzi: "年级", pinyin: "niánjí" },
+            { indonesia: "lagi", hanzi: "又", pinyin: "yòu" },
+            { indonesia: "marco", hanzi: "马可", pinyin: "mǎ kě" },
+            { indonesia: "pintar", hanzi: "聪明", pinyin: "cōngmíng" },
+            { indonesia: "ramah dan antusias", hanzi: "热情", pinyin: "rèqíng" },
+            { indonesia: "bekerja keras/rajin", hanzi: "努力", pinyin: "nǔlì" },
+            { indonesia: "selalu", hanzi: "总是", pinyin: "zǒngshì" },
+            { indonesia: "menjawab", hanzi: "回答", pinyin: "huídá" },
+            { indonesia: "berdiri", hanzi: "站", pinyin: "zhàn" },
+            { indonesia: "lapar", hanzi: "饿", pinyin: "è" },
+            { indonesia: "supermarket", hanzi: "超市", pinyin: "chāoshì" },
+            { indonesia: "kue", hanzi: "蛋糕", pinyin: "dàngāo" },
+            { indonesia: "muda belia", hanzi: "年轻", pinyin: "niánqīng" },
+            { indonesia: "serius", hanzi: "认真", pinyin: "rènzhēn" },
+            { indonesia: "tamu", hanzi: "客人", pinyin: "kè rén" },
+            // Lesson 5 (68-80)
+            { indonesia: "demam", hanzi: "发烧", pinyin: "fāshāo" },
+            { indonesia: "demi/untuk", hanzi: "为", pinyin: "wèi" },
+            { indonesia: "menjaga/merawat", hanzi: "照顾", pinyin: "zhàogù" },
+            { indonesia: "memakai/menggunakan", hanzi: "用", pinyin: "yòng" },
+            { indonesia: "masuk angin/flu", hanzi: "感冒", pinyin: "gǎnmào" },
+            { indonesia: "musim", hanzi: "季节", pinyin: "jìjié" },
+            { indonesia: "tentu saja/pastinya", hanzi: "当然", pinyin: "dāngrán" },
+            { indonesia: "musim semi", hanzi: "春天", pinyin: "chūntiān" },
+            { indonesia: "rumput", hanzi: "草", pinyin: "cǎo" },
+            { indonesia: "musim panas", hanzi: "夏天", pinyin: "xiàtiān" },
+            { indonesia: "gaun/rok", hanzi: "裙子", pinyin: "qúnzi" },
+            { indonesia: "belakangan ini/baru-baru ini", hanzi: "最近", pinyin: "zuìjìn" },
+            { indonesia: "semakin", hanzi: "越", pinyin: "yuè" },
+            // Lesson 6 (81-95)
+            { indonesia: "mata", hanzi: "眼睛", pinyin: "yǎnjīng" },
+            { indonesia: "tiba-tiba", hanzi: "突然", pinyin: "tūrán" },
+            { indonesia: "meninggalkan", hanzi: "离开", pinyin: "líkāi" },
+            { indonesia: "jelas", hanzi: "清楚", pinyin: "qīngchǔ" },
+            { indonesia: "tadi/barusan", hanzi: "刚才", pinyin: "gāngcái" },
+            { indonesia: "menolong/membantu", hanzi: "帮忙", pinyin: "bāngmáng" },
+            { indonesia: "berbeda/sangat", hanzi: "特别", pinyin: "tèbié" },
+            { indonesia: "menjelaskan", hanzi: "讲", pinyin: "jiǎng" },
+            { indonesia: "mengerti/jelas", hanzi: "明白", pinyin: "míngbái" },
+            { indonesia: "latihan fisik", hanzi: "锻炼", pinyin: "duànliàn" },
+            { indonesia: "musik", hanzi: "音乐", pinyin: "yīnyuè" },
+            { indonesia: "taman", hanzi: "公园", pinyin: "gōngyuán" },
+            { indonesia: "ngobrol/bincang", hanzi: "聊天", pinyin: "liáotiān" },
+            { indonesia: "tidur", hanzi: "睡觉", pinyin: "shuìjiào" },
+            { indonesia: "makin/semakin", hanzi: "更", pinyin: "gèng" },
+            // Lesson 7 (96-107)
+            { indonesia: "rekan", hanzi: "同事", pinyin: "tóngshì" },
+            { indonesia: "dulu/sebelumnya", hanzi: "以前", pinyin: "yǐqián" },
+            { indonesia: "bank", hanzi: "银行", pinyin: "yínháng" },
+            { indonesia: "lama", hanzi: "久", pinyin: "jiǔ" },
+            { indonesia: "tertarik", hanzi: "感兴趣", pinyin: "gǎnxìngqù" },
+            { indonesia: "menikah", hanzi: "结婚", pinyin: "jiéhūn" },
+            { indonesia: "menyambut", hanzi: "欢迎", pinyin: "huānyíng" },
+            { indonesia: "terlambat", hanzi: "迟到", pinyin: "chídào" },
+            { indonesia: "setengah (jam)", hanzi: "半", pinyin: "bàn" },
+            { indonesia: "menjemput/menerima", hanzi: "接", pinyin: "jiē" },
+            { indonesia: "seperempat (jam)", hanzi: "刻", pinyin: "kè" },
+            { indonesia: "kurang", hanzi: "差", pinyin: "chà" },
+            // Lesson 8 (108-124)
+            { indonesia: "lagi", hanzi: "又", pinyin: "yòu" },
+            { indonesia: "puas", hanzi: "满意", pinyin: "mǎnyì" },
+            { indonesia: "eskavator/lift", hanzi: "电梯", pinyin: "diàntī" },
+            { indonesia: "tingkatan (lantai)", hanzi: "层", pinyin: "céng" },
+            { indonesia: "takut", hanzi: "害怕", pinyin: "hàipà" },
+            { indonesia: "panda", hanzi: "熊猫", pinyin: "xióngmāo" },
+            { indonesia: "bertemu", hanzi: "见面", pinyin: "jiànmiàn" },
+            { indonesia: "tenang/diam/sunyi", hanzi: "安静", pinyin: "ān jìng" },
+            { indonesia: "cola/minuman bersoda", hanzi: "可乐", pinyin: "kělè" },
+            { indonesia: "sebentar", hanzi: "一会儿", pinyin: "yīhuìr" },
+            { indonesia: "segera", hanzi: "马上", pinyin: "mǎshang" },
+            { indonesia: "kamar kecil", hanzi: "洗手间", pinyin: "xǐshǒujiān" },
+            { indonesia: "tua", hanzi: "老", pinyin: "lǎo" },
+            { indonesia: "hampir", hanzi: "几乎", pinyin: "jīhū" },
+            { indonesia: "berubah/perubahan", hanzi: "变化", pinyin: "biànhuà" },
+            { indonesia: "sehat", hanzi: "健康", pinyin: "jiànkāng" },
+            { indonesia: "penting", hanzi: "重要", pinyin: "zhòngyào" },
+            // Lesson 9 (125-139)
+            { indonesia: "bahasa Mandarin", hanzi: "中文", pinyin: "zhōngwén" },
+            { indonesia: "kelas", hanzi: "班", pinyin: "bān" },
+            { indonesia: "sama/serupa", hanzi: "一样", pinyin: "yīyàng" },
+            { indonesia: "nama orang/gunung besar", hanzi: "大山", pinyin: "dà shān" },
+            { indonesia: "nama orang", hanzi: "李静", pinyin: "lǐ jìng" },
+            { indonesia: "paling akhir/terakhir", hanzi: "最后", pinyin: "zuìhòu" },
+            { indonesia: "tenang/tidak perlu cemas", hanzi: "放心", pinyin: "fàngxīn" },
+            { indonesia: "pasti", hanzi: "一定", pinyin: "yīdìng" },
+            { indonesia: "khawatir/cemas", hanzi: "担心", pinyin: "dānxīn" },
+            { indonesia: "lebih/membandingkan", hanzi: "比较", pinyin: "bǐjiào" },
+            { indonesia: "memahami", hanzi: "了解", pinyin: "liáojiě" },
+            { indonesia: "terlebih dulu/pertama-tama", hanzi: "先", pinyin: "xiān" },
+            { indonesia: "tengah/diantara", hanzi: "中间", pinyin: "zhōngjiān" },
+            { indonesia: "menghadiri/ikut serta", hanzi: "参加", pinyin: "cānjiā" },
+            { indonesia: "pengaruh", hanzi: "影响", pinyin: "yǐngxiǎng" },
+            // Lesson 10 (140-154)
+            { indonesia: "perawakan/postur", hanzi: "个子", pinyin: "gèzi" },
+            { indonesia: "pendek/rendah", hanzi: "矮", pinyin: "ǎi" },
+            { indonesia: "sejarah", hanzi: "历史", pinyin: "lìshǐ" },
+            { indonesia: "olahraga", hanzi: "体育", pinyin: "tǐyù" },
+            { indonesia: "matematika", hanzi: "数学", pinyin: "shùxué" },
+            { indonesia: "praktis/leluasa", hanzi: "方便", pinyin: "fāngbiàn" },
+            { indonesia: "sepeda", hanzi: "自行车", pinyin: "zìxíngchē" },
+            { indonesia: "mengendarai", hanzi: "骑", pinyin: "qí" },
+            { indonesia: "lama/usang", hanzi: "旧", pinyin: "jiù" },
+            { indonesia: "mengganti/menukar", hanzi: "换", pinyin: "huàn" },
+            { indonesia: "tempat", hanzi: "地方", pinyin: "dìfāng" },
+            { indonesia: "agen/makelar", hanzi: "中介", pinyin: "zhōngjiè" },
+            { indonesia: "utama/pokok", hanzi: "主要", pinyin: "zhǔyào" },
+            { indonesia: "lingkungan", hanzi: "环境", pinyin: "huánjìng" },
+            { indonesia: "sekitar/terdekat", hanzi: "附近", pinyin: "fùjìn" },
+            // Lesson 11 (155-173)
+            { indonesia: "perpustakaan", hanzi: "图书馆", pinyin: "túshūguǎn" },
+            { indonesia: "meminjam", hanzi: "借", pinyin: "jiè" },
+            { indonesia: "kamus", hanzi: "词典", pinyin: "cídiǎn" },
+            { indonesia: "mengembalikan", hanzi: "还", pinyin: "huán" },
+            { indonesia: "lampu", hanzi: "灯", pinyin: "dēng" },
+            { indonesia: "rapat", hanzi: "会议", pinyin: "huìyì" },
+            { indonesia: "selesai/berakhir", hanzi: "结束", pinyin: "jiéshù" },
+            { indonesia: "lupa", hanzi: "忘记", pinyin: "wàngjì" },
+            { indonesia: "AC", hanzi: "空调", pinyin: "kōngtiáo" },
+            { indonesia: "tutup/mematikan", hanzi: "关", pinyin: "guān" },
+            { indonesia: "kereta bawah tanah", hanzi: "地铁", pinyin: "dìtiě" },
+            { indonesia: "sepasang", hanzi: "双", pinyin: "shuāng" },
+            { indonesia: "sumpit", hanzi: "筷子", pinyin: "kuàizi" },
+            { indonesia: "anggur(bir)", hanzi: "啤酒", pinyin: "píjiǔ" },
+            { indonesia: "seteguk", hanzi: "口", pinyin: "kǒu" },
+            { indonesia: "botol", hanzi: "瓶子", pinyin: "píngzi" },
+            { indonesia: "buku catatan (laptop)", hanzi: "笔记本", pinyin: "bǐjìběn" },
+            { indonesia: "email", hanzi: "电子邮件", pinyin: "diànzǐ yóujiàn" },
+            { indonesia: "kebiasaan", hanzi: "习惯", pinyin: "xíguàn" },
+            // Lesson 12 (174-187)
+            { indonesia: "matahari", hanzi: "太阳", pinyin: "tàiyáng" },
+            { indonesia: "barat", hanzi: "西", pinyin: "xī" },
+            { indonesia: "marah", hanzi: "生气", pinyin: "shēngqì" },
+            { indonesia: "koper/bagasi", hanzi: "行李箱", pinyin: "xínglǐxiāng" },
+            { indonesia: "diri sendiri", hanzi: "自己", pinyin: "zìjǐ" },
+            { indonesia: "tas", hanzi: "包", pinyin: "bāo" },
+            { indonesia: "menyadari/menemukan", hanzi: "发现", pinyin: "fāxiàn" },
+            { indonesia: "paspor", hanzi: "护照", pinyin: "hùzhào" },
+            { indonesia: "lepas landas", hanzi: "起飞", pinyin: "qǐfēi" },
+            { indonesia: "sopir", hanzi: "司机", pinyin: "sījī" },
+            { indonesia: "mengajar", hanzi: "教", pinyin: "jiào" },
+            { indonesia: "melukis/menggambar", hanzi: "画", pinyin: "huà" },
+            { indonesia: "butuh/perlu", hanzi: "需要", pinyin: "xūyào" },
+            { indonesia: "papan tulis (hitam)", hanzi: "黑板", pinyin: "hēibǎn" },
+            // Lesson 13 (188-202)
+            { indonesia: "akhirnya", hanzi: "终于", pinyin: "zhōngyú" },
+            { indonesia: "kakek", hanzi: "爷爷", pinyin: "yéye" },
+            { indonesia: "hadiah", hanzi: "礼物", pinyin: "lǐwù" },
+            { indonesia: "nenek", hanzi: "奶奶", pinyin: "nǎinai" },
+            { indonesia: "bertemu/menemui", hanzi: "遇到", pinyin: "yùdào" },
+            { indonesia: "sambil", hanzi: "一边", pinyin: "yībiān" },
+            { indonesia: "berlalu/ke sana", hanzi: "过去", pinyin: "guòqù" },
+            { indonesia: "biasa/umum", hanzi: "一般", pinyin: "yībān" },
+            { indonesia: "bersedia", hanzi: "愿意", pinyin: "yuànyì" },
+            { indonesia: "berdiri/bangun", hanzi: "起来", pinyin: "qǐlái" },
+            { indonesia: "harus/seharusnya", hanzi: "应该", pinyin: "yīnggāi" },
+            { indonesia: "kehidupan", hanzi: "生活", pinyin: "shēnghuó" },
+            { indonesia: "kepala sekolah", hanzi: "校长", pinyin: "xiàozhǎng" },
+            { indonesia: "rusak/jahat", hanzi: "坏", pinyin: "huài" },
+            { indonesia: "sering", hanzi: "经常", pinyin: "jīngcháng" },
+            // Lesson 14 (203-219)
+            { indonesia: "membersihkan", hanzi: "打扫", pinyin: "dǎsǎo" },
+            { indonesia: "bersih", hanzi: "干净", pinyin: "gānjìng" },
+            { indonesia: "kemudian", hanzi: "然后", pinyin: "ránhòu" },
+            { indonesia: "lemari es", hanzi: "冰箱", pinyin: "bīngxiāng" },
+            { indonesia: "mandi", hanzi: "洗澡", pinyin: "xǐzǎo" },
+            { indonesia: "acara/program", hanzi: "节目", pinyin: "jiémù" },
+            { indonesia: "bulan/rembulan", hanzi: "月亮", pinyin: "yuèliàng" },
+            { indonesia: "seperti/serupa", hanzi: "像", pinyin: "xiàng" },
+            { indonesia: "piring", hanzi: "盘子", pinyin: "pánzi" },
+            { indonesia: "bertiup/berhembus angin", hanzi: "刮风", pinyin: "guāfēng" },
+            { indonesia: "paman", hanzi: "叔叔", pinyin: "shūshu" },
+            { indonesia: "bibi/tante", hanzi: "阿姨", pinyin: "āyí" },
+            { indonesia: "cerita", hanzi: "故事", pinyin: "gùshì" },
+            { indonesia: "suara", hanzi: "声音", pinyin: "shēngyīn" },
+            { indonesia: "menu", hanzi: "菜单", pinyin: "càidān" },
+            { indonesia: "sederhana/mudah", hanzi: "简单", pinyin: "jiǎndān" },
+            { indonesia: "pisang", hanzi: "香蕉", pinyin: "xiāngjiāo" },
+            // Lesson 15 (220-241)
+            { indonesia: "belajar ke luar negeri", hanzi: "留学", pinyin: "liúxué" },
+            { indonesia: "level/tingkatan", hanzi: "水平", pinyin: "shuǐpíng" },
+            { indonesia: "meningkatkan", hanzi: "提高", pinyin: "tígāo" },
+            { indonesia: "latihan", hanzi: "练习", pinyin: "liànxí" },
+            { indonesia: "menyelesaikan", hanzi: "完成", pinyin: "wánchéng" },
+            { indonesia: "kalimat", hanzi: "句子", pinyin: "jùzi" },
+            { indonesia: "yang lain", hanzi: "其他", pinyin: "qítā" },
+            { indonesia: "membagikan/mengirim", hanzi: "发", pinyin: "fā" },
+            { indonesia: "permohonan/permintaan", hanzi: "要求", pinyin: "yāoqiú" },
+            { indonesia: "perhatian/memperhatikan", hanzi: "注意", pinyin: "zhùyì" },
+            { indonesia: "nama orang/awan kecil", hanzi: "小云", pinyin: "xiǎoyún" },
+            { indonesia: "menjelajah internet", hanzi: "上网", pinyin: "shàngwǎng" },
+            { indonesia: "selain", hanzi: "除了", pinyin: "chúle" },
+            { indonesia: "berita", hanzi: "新闻", pinyin: "xīnwén" },
+            { indonesia: "menghabiskan", hanzi: "花", pinyin: "huā" },
+            { indonesia: "sangat (ekstrim)", hanzi: "极了", pinyin: "jíle" },
+            { indonesia: "festival/perayaan", hanzi: "节日", pinyin: "jiérì" },
+            { indonesia: "menyelenggarakan", hanzi: "举行", pinyin: "jǔxíng" },
+            { indonesia: "dunia", hanzi: "世界", pinyin: "shìjiè" },
+            { indonesia: "jalan raya", hanzi: "街道", pinyin: "jiēdào" },
+            { indonesia: "masing-masing/berbagai", hanzi: "各", pinyin: "gè" },
+            { indonesia: "budaya", hanzi: "文化", pinyin: "wénhuà" },
+            // Lesson 16 (242-257)
+            { indonesia: "kota", hanzi: "城市", pinyin: "chéngshì" },
+            { indonesia: "jika", hanzi: "如果", pinyin: "rúguǒ" },
+            { indonesia: "mengira", hanzi: "认为", pinyin: "rènwéi" },
+            { indonesia: "sepatu (kulit)", hanzi: "皮鞋", pinyin: "píxié" },
+            { indonesia: "topi", hanzi: "帽子", pinyin: "màozi" },
+            { indonesia: "tumbuh", hanzi: "长", pinyin: "zhǎng" },
+            { indonesia: "imut", hanzi: "可爱", pinyin: "kě'ài" },
+            { indonesia: "meter", hanzi: "米", pinyin: "mǐ" },
+            { indonesia: "kilogram", hanzi: "公斤", pinyin: "gōngjīn" },
+            { indonesia: "hidung", hanzi: "鼻子", pinyin: "bízi" },
+            { indonesia: "rambut", hanzi: "头发", pinyin: "tóufa" },
+            { indonesia: "memeriksa", hanzi: "检查", pinyin: "jiǎnchá" },
+            { indonesia: "menyikat gigi", hanzi: "刷牙", pinyin: "shuāyá" },
+            { indonesia: "hubungan", hanzi: "关系", pinyin: "guānxi" },
+            { indonesia: "orang lain", hanzi: "别人", pinyin: "biérén" },
+            { indonesia: "kosakata", hanzi: "词语", pinyin: "cíyǔ" },
+            // Lesson 17 (258-273)
+            { indonesia: "ijin/cuti", hanzi: "请假", pinyin: "qǐngjià" },
+            { indonesia: "total/keseluruhan", hanzi: "一共", pinyin: "yīgòng" },
+            { indonesia: "tetangga", hanzi: "邻居", pinyin: "línjū" },
+            { indonesia: "kemudian/akhirnya", hanzi: "后来", pinyin: "hòulái" },
+            { indonesia: "hobi", hanzi: "爱好", pinyin: "àihào" },
+            { indonesia: "cara", hanzi: "办法", pinyin: "bànfǎ" },
+            { indonesia: "kenyang", hanzi: "饱", pinyin: "bǎo" },
+            { indonesia: "demi/untuk", hanzi: "为了", pinyin: "wèile" },
+            { indonesia: "memutuskan", hanzi: "决定", pinyin: "juédìng" },
+            { indonesia: "pilihan/memilih", hanzi: "选择", pinyin: "xuǎnzé" },
+            { indonesia: "musim dingin", hanzi: "冬天", pinyin: "dōngtiān" },
+            { indonesia: "harus/tidak boleh tidak", hanzi: "必须", pinyin: "bìxū" },
+            { indonesia: "berdasarkan", hanzi: "根据", pinyin: "gēnjù" },
+            { indonesia: "situasi/keadaan", hanzi: "情况", pinyin: "qíngkuàng" },
+            { indonesia: "mulut", hanzi: "口", pinyin: "kǒu" },
+            { indonesia: "haus", hanzi: "渴", pinyin: "kě" },
+            // Lesson 18 (274-290)
+            { indonesia: "menghadap/mengarah", hanzi: "向", pinyin: "xiàng" },
+            { indonesia: "puluh ribu", hanzi: "万", pinyin: "wàn" },
+            { indonesia: "ekor (satuan u/hewan)", hanzi: "只", pinyin: "zhī" },
+            { indonesia: "mulut", hanzi: "嘴", pinyin: "zuǐ" },
+            { indonesia: "hewan", hanzi: "动物", pinyin: "dòngwù" },
+            { indonesia: "satuan waktu", hanzi: "段", pinyin: "duàn" },
+            { indonesia: "tidak hanya...bahkan...", hanzi: "不但...而且", pinyin: "bùdàn...érqiě" },
+            { indonesia: "terkenal", hanzi: "有名", pinyin: "yǒumíng" },
+            { indonesia: "setuju", hanzi: "同意", pinyin: "tóngyì" },
+            { indonesia: "percaya", hanzi: "相信", pinyin: "xiāngxìn" },
+            { indonesia: "tentang", hanzi: "关于", pinyin: "guānyú" },
+            { indonesia: "kesempatan", hanzi: "机会", pinyin: "jīhuì" },
+            { indonesia: "negara", hanzi: "国家", pinyin: "guójiā" },
+            { indonesia: "macam/jenis", hanzi: "种", pinyin: "zhǒng" },
+            { indonesia: "kelebihan/karakteristik", hanzi: "特点", pinyin: "tèdiǎn" },
+            { indonesia: "aneh", hanzi: "奇怪", pinyin: "qíguài" },
+            { indonesia: "digunakan sebelum verb", hanzi: "地", pinyin: "de" },
+            // ========== KOSAKATA TAMBAHAN (28 item) ==========
+            { indonesia: "telinga", hanzi: "耳朵", pinyin: "ěrduo" },
+            { indonesia: "wajah", hanzi: "脸", pinyin: "liǎn" },
+            { indonesia: "pendek", hanzi: "短", pinyin: "duǎn" },
+            { indonesia: "kuda", hanzi: "马", pinyin: "mǎ" },
+            { indonesia: "lembar (satuan u/kertas/foto)", hanzi: "张", pinyin: "zhāng" },
+            { indonesia: "satuan u/orang", hanzi: "位", pinyin: "wèi" },
+            { indonesia: "biru", hanzi: "蓝", pinyin: "lán" },
+            { indonesia: "musim gugur", hanzi: "秋天", pinyin: "qiūtiān" },
+            { indonesia: "pernah/lewat", hanzi: "过", pinyin: "guò" },
+            { indonesia: "burung", hanzi: "鸟", pinyin: "niǎo" },
+            { indonesia: "menangis", hanzi: "哭", pinyin: "kū" },
+            { indonesia: "sungai kuning", hanzi: "黄河", pinyin: "huánghé" },
+            { indonesia: "kapal", hanzi: "船", pinyin: "chuán" },
+            { indonesia: "melewati", hanzi: "经过", pinyin: "jīngguò" },
+            { indonesia: "kamera", hanzi: "照相机", pinyin: "zhàoxiàngjī" },
+            { indonesia: "di (kalimat pasif)", hanzi: "被", pinyin: "bèi" },
+            { indonesia: "sedih", hanzi: "难过", pinyin: "nánguò" },
+            { indonesia: "timur", hanzi: "东", pinyin: "dōng" },
+            { indonesia: "kartu kredit", hanzi: "信用卡", pinyin: "xìnyòngkǎ" },
+            { indonesia: "perhatian", hanzi: "关心", pinyin: "guānxīn" },
+            { indonesia: "asalkan(hanya ada)...baru(bisa)...", hanzi: "只有...才", pinyin: "zhǐyǒu...cái" },
+            { indonesia: "nilai/prestasi", hanzi: "成绩", pinyin: "chéngjì" },
+            { indonesia: "mangkuk", hanzi: "碗", pinyin: "wǎn" },
+            { indonesia: "membedakan/membagikan", hanzi: "分", pinyin: "fēn" },
+            { indonesia: "menyelesaikan", hanzi: "解决", pinyin: "jiějué" },
+            { indonesia: "mencoba", hanzi: "试", pinyin: "shì" },
+            { indonesia: "benar-benar", hanzi: "真正", pinyin: "zhēnzhèng" },
+            { indonesia: "begitu/sangat", hanzi: "多么", pinyin: "duōme" }
+        ];
+
+        // ========== State & Variabel Global ==========
+        const totalSoal = vocab.length;
+        let currentIndex = 0; // 0-based
+        let jawabanUser = JSON.parse(localStorage.getItem('shinchanHSK3')) || []; // array { jawaban: string, benar: boolean } atau null jika belum dijawab
+        let emailTerkirim = false;
+
+        // Elemen DOM
+        const soalArtiEl = document.getElementById('soalArti');
+        const jawabanInput = document.getElementById('jawabanInput');
+        const feedbackArea = document.getElementById('feedbackArea');
+        const progressDisplay = document.getElementById('progressDisplay');
+        const submitBtn = document.getElementById('submitBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const audioBtn = document.getElementById('audioBtn');
+
+        // ========== Fungsi bantuan ==========
+        function simpanKeStorage() {
+            localStorage.setItem('shinchanHSK3', JSON.stringify(jawabanUser));
+        }
+
+        function updateTampilanSoal() {
+            const soal = vocab[currentIndex];
+            soalArtiEl.innerText = soal.indonesia;
+            // cek apakah sudah pernah dijawab
+            if (jawabanUser[currentIndex] && jawabanUser[currentIndex].jawaban !== undefined) {
+                jawabanInput.value = jawabanUser[currentIndex].jawaban || '';
+                // tampilkan feedback sesuai status
+                if (jawabanUser[currentIndex].benar) {
+                    feedbackArea.innerHTML = '✅ Benar! ' + (soal.pinyin ? '(' + soal.pinyin + ')' : '');
+                } else {
+                    feedbackArea.innerHTML = '❌ Salah. Jawaban benar: ' + soal.hanzi + ' (' + soal.pinyin + ')';
+                }
+            } else {
+                jawabanInput.value = '';
+                feedbackArea.innerHTML = '✏️ Tulis jawaban di kotak, lalu tekan submit!';
+            }
+            progressDisplay.innerText = `Soal ${currentIndex+1} / ${totalSoal}`;
+        }
+
+        // Fungsi baca hanzi (audio)
+        function playAudio() {
+            const teks = vocab[currentIndex].hanzi;
+            if (teks && window.speechSynthesis) {
+                const utterance = new SpeechSynthesisUtterance(teks);
+                utterance.lang = 'zh-CN';
+                utterance.rate = 0.9;
+                speechSynthesis.cancel(); // Hentikan yang sedang berjalan
+                speechSynthesis.speak(utterance);
+            } else {
+                alert('Browser tidak mendukung text-to-speech');
+            }
+        }
+
+        // Fungsi kirim email via EmailJS (WAJIB ganti public key & service ID)
+        function kirimEmail() {
+            if (emailTerkirim) return; // hindari kirim berkali-kali
+            // Hitung statistik
+            let totalTerjawab = 0;
+            let totalBenar = 0;
+            const detail = jawabanUser.map((item, idx) => {
+                if (item && item.jawaban !== undefined) {
+                    totalTerjawab++;
+                    if (item.benar) totalBenar++;
+                    return `${idx+1}. ${vocab[idx].indonesia} -> jawab: ${item.jawaban} (${item.benar ? '✔️' : '✖️'}) benar: ${vocab[idx].hanzi}`;
+                } else {
+                    return `${idx+1}. ${vocab[idx].indonesia} -> belum dijawab`;
+                }
+            }).join('\n');
+
+            const message = `Hasil Game HSK3 Shinchan:\n\nTotal Soal: ${totalSoal}\nTerjawab: ${totalTerjawab}\nBenar: ${totalBenar}\nSalah: ${totalTerjawab - totalBenar}\n\nDetail:\n${detail}`;
+
+            // Parameter EmailJS - sesuaikan dengan template mu!
+            const templateParams = {
+                to_email: 'lcnhsk3palembang@gmail.com',
+                subject: 'Laporan Game HSK3 Shinchan',
+                message: message
+            };
+
+            // Ganti 'YOUR_SERVICE_ID' dan 'YOUR_TEMPLATE_ID' dengan milikmu
+            emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
+                .then(() => {
+                    console.log('Email berhasil dikirim');
+                    emailTerkirim = true;
+                })
+                .catch((err) => {
+                    console.error('Gagal kirim email:', err);
+                    alert('Gagal mengirim email. Pastikan konfigurasi EmailJS benar.');
+                });
+        }
+
+        // Fungsi saat submit
+        function handleSubmit() {
+            const jawaban = jawabanInput.value.trim();
+            const soal = vocab[currentIndex];
+            const benar = (jawaban === soal.hanzi); // bandingkan persis
+            // Simpan ke array
+            jawabanUser[currentIndex] = {
+                jawaban: jawaban,
+                benar: benar
+            };
+            simpanKeStorage();
+
+            // Tampilkan feedback
+            if (benar) {
+                feedbackArea.innerHTML = '✅ Benar! ' + (soal.pinyin ? '(' + soal.pinyin + ')' : '');
+            } else {
+                feedbackArea.innerHTML = '❌ Salah. Jawaban benar: ' + soal.hanzi + ' (' + soal.pinyin + ')';
+            }
+
+            // Cek apakah semua soal sudah dijawab (tidak ada undefined)
+            const semuaTerjawab = jawabanUser.length === totalSoal && jawabanUser.every(item => item !== undefined);
+            if (semuaTerjawab && !emailTerkirim) {
+                kirimEmail();
+            }
+        }
+
+        // Fungsi next
+        function handleNext() {
+            if (currentIndex < totalSoal - 1) {
+                currentIndex++;
+                updateTampilanSoal();
+            } else {
+                // sudah di soal terakhir, loop ke awal atau tampilkan pesan
+                if (confirm('Kamu sudah sampai soal terakhir! Kembali ke awal?')) {
+                    currentIndex = 0;
+                    updateTampilanSoal();
+                }
+            }
+        }
+
+        // Event beforeunload: kirim email jika ada data dan belum terkirim
+        window.addEventListener('beforeunload', function() {
+            if (jawabanUser.length > 0 && !emailTerkirim) {
+                // Gunakan sendBeacon agar lebih reliable saat unload
+                const data = {
+                    to_email: 'lcnhsk3palembang@gmail.com',
+                    subject: 'Laporan Game HSK3 (auto refresh)',
+                    message: 'Data dikirim saat refresh. Lihat localStorage untuk detail.'
+                };
+                // Kirim via EmailJS tidak bisa via sendBeacon, kita fallback ke fetch sinkron? Sulit.
+                // Untuk kemudahan, kita panggil kirimEmail() secara biasa, mungkin tidak sempat.
+                // Alternatif: kita simpan flag dan kirim saat load berikutnya? 
+                // Di sini kita panggil kirimEmail, semoga sempat.
+                kirimEmail();
+            }
+        });
+
+        // Inisialisasi: load soal pertama dan event listeners
+        function init() {
+            // Jika jawabanUser belum sesuai panjang, inisialisasi array
+            if (jawabanUser.length < totalSoal) {
+                // isi dengan undefined untuk yang kurang
+                jawabanUser = jawabanUser.concat(new Array(totalSoal - jawabanUser.length).fill(undefined));
+            } else if (jawabanUser.length > totalSoal) {
+                jawabanUser = jawabanUser.slice(0, totalSoal);
+            }
+            simpanKeStorage();
+            updateTampilanSoal();
+
+            submitBtn.addEventListener('click', handleSubmit);
+            nextBtn.addEventListener('click', handleNext);
+            audioBtn.addEventListener('click', playAudio);
+
+            // Enter di input memicu submit
+            jawabanInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleSubmit();
+                }
+            });
+        }
+
+        init();
+    })();
+</script>
+<!-- Catatan: Jangan lupa ganti YOUR_PUBLIC_KEY, YOUR_SERVICE_ID, YOUR_TEMPLATE_ID dengan milikmu dari emailjs.com -->
+</body>
+</html>
